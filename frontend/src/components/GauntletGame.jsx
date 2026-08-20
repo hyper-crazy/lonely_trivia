@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, XCircle, Clock as ClockIcon, Heart, ShieldAlert, Trophy, AlertTriangle, FastForward, Flame } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -7,12 +7,12 @@ import BackButton from './BackButton';
 import GameLoader from './GameLoader';
 
 const TIMER_DURATION = 15;
-const MAX_LIVES = 3;
-const MAX_QUESTIONS = 10;
+const MAX_LIVES = 5;
 
 export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [totalAnsweredCount, setTotalAnsweredCount] = useState(0); 
   const [loading, setLoading] = useState(true);
   
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -23,10 +23,11 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
   
   const [isGameOver, setIsGameOver] = useState(false);
-  const [isVictory, setIsVictory] = useState(false);
   const [showFleeModal, setShowFleeModal] = useState(false);
   const [countdown, setCountdown] = useState(null); 
-  const [streakPopup, setStreakPopup] = useState(null);
+  const [floatingText, setFloatingText] = useState(null); 
+
+  const isAdvancingRef = useRef(false);
 
   useEffect(() => {
     const savedBest = localStorage.getItem(`gauntletBestScore_${difficulty}`);
@@ -34,32 +35,37 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
   }, [difficulty]);
 
   useEffect(() => {
-    setLoading(true);
-    
-    Promise.all([
-      fetchGauntletQuestions(difficulty),
-      new Promise(resolve => setTimeout(resolve, 1111))
-    ])
-      .then(([data]) => {
-        setQuestions(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to load gauntlet questions:", err);
-        setLoading(false);
-      });
+    loadQuestions(true); 
   }, [difficulty]);
 
   useEffect(() => {
-    if ((isGameOver || isVictory) && score > bestScore) {
+    if (isGameOver && score > bestScore) {
       setBestScore(score);
       localStorage.setItem(`gauntletBestScore_${difficulty}`, score);
     }
-  }, [isGameOver, isVictory, score, bestScore, difficulty]);
+  }, [isGameOver, score, bestScore, difficulty]);
+
+  const loadQuestions = (isInitial = false) => {
+    if (isInitial) setLoading(true);
+    
+    Promise.all([
+      fetchGauntletQuestions(difficulty),
+      new Promise(resolve => setTimeout(resolve, isInitial ? 1111 : 300))
+    ])
+      .then(([data]) => {
+        setQuestions(data);
+        setCurrentIndex(0);
+        if (isInitial) setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to load gauntlet questions:", err);
+        if (isInitial) setLoading(false);
+      });
+  };
 
   // Main Question Timer
   useEffect(() => {
-    if (loading || selectedAnswer || isGameOver || isVictory || showFleeModal) return;
+    if (loading || selectedAnswer || isGameOver || showFleeModal) return;
     
     if (timeLeft === 0) {
       handleWrongAnswer("TIMEOUT");
@@ -67,17 +73,23 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
     }
     const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
     return () => clearInterval(timer);
-  }, [timeLeft, loading, selectedAnswer, isGameOver, isVictory, showFleeModal]);
+  }, [timeLeft, loading, selectedAnswer, isGameOver, showFleeModal]);
 
+  // Auto-Advance Countdown Trigger
   useEffect(() => {
-    if (!selectedAnswer || isGameOver || isVictory) return;
+    if (!selectedAnswer || isGameOver) return;
 
+    isAdvancingRef.current = false;
     setCountdown(3);
+    
     const interval = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(interval);
-          advanceToNextState();
+          if (!isAdvancingRef.current) {
+            isAdvancingRef.current = true;
+            advanceToNextState();
+          }
           return null;
         }
         return prev - 1;
@@ -85,11 +97,12 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [selectedAnswer, isGameOver, isVictory]);
+  }, [selectedAnswer, isGameOver]);
 
   const handleWrongAnswer = (option) => {
+    if (selectedAnswer) return;
     setSelectedAnswer(option || "TIMEOUT_WRONG");
-    setLives(prev => prev - 1);
+    setLives(prev => Math.max(0, prev - 1));
     setStreak(0); 
   };
 
@@ -103,15 +116,15 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
       setSelectedAnswer(option);
       
       let pointsEarned = diff === 'hard' ? 5 : diff === 'medium' ? 3 : 1;
-      const newStreak = streak + 1;
+      const newStreak = streak >= 10 ? 1 : streak + 1;
       setStreak(newStreak);
 
       if (newStreak === 5) {
         pointsEarned += 25;
-        triggerStreakPopup("+25 Streak Bonus!");
+        triggerFloatingText("+25 pts", 'streak');
       } else if (newStreak === 10) {
         pointsEarned += 50;
-        triggerStreakPopup("+50 Max Streak Bonus!");
+        triggerFloatingText("+50 pts", 'streak');
       }
 
       setScore(prev => prev + pointsEarned);
@@ -132,9 +145,12 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
     setSelectedAnswer("PASSED");
   };
 
-  const triggerStreakPopup = (text) => {
-    setStreakPopup(text);
-    setTimeout(() => setStreakPopup(null), 2000);
+  const triggerFloatingText = (text, type) => {
+    const id = Date.now();
+    setFloatingText({ id, text, type });
+    setTimeout(() => {
+      setFloatingText(prev => prev?.id === id ? null : prev);
+    }, 1000);
   };
 
   const advanceToNextState = () => {
@@ -142,9 +158,15 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
       setIsGameOver(true);
       return;
     }
-    if (currentIndex >= MAX_QUESTIONS - 1) {
-      triggerVictoryConfetti();
-      setIsVictory(true);
+
+    const nextAnsweredCount = totalAnsweredCount + 1;
+    setTotalAnsweredCount(nextAnsweredCount);
+
+    if (currentIndex >= questions.length - 1) {
+      loadQuestions(false);
+      setSelectedAnswer(null);
+      setCountdown(null);
+      setTimeLeft(TIMER_DURATION);
       return;
     }
     
@@ -154,20 +176,11 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
     setTimeLeft(TIMER_DURATION);
   };
 
-  const triggerVictoryConfetti = () => {
-    const duration = 3000;
-    const end = Date.now() + duration;
-    const frame = () => {
-      confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#06b6d4', '#a855f7'] });
-      confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#06b6d4', '#a855f7'] });
-      if (Date.now() < end) requestAnimationFrame(frame);
-    };
-    frame();
-  };
-
-  if (loading) return <GameLoader text={`Initializing ${difficulty} Questions...`} />;
+  if (loading) return <GameLoader text={`Initializing ${difficulty} Gauntlet...`} />;
 
   const currentQ = questions[currentIndex];
+  if (!currentQ) return null;
+
   const containerVariants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
   const itemVariants = { hidden: { opacity: 0, y: 20, scale: 0.95 }, show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 300, damping: 24 } } };
 
@@ -180,6 +193,22 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
         exit={{ opacity: 0, scale: 0.95 }}
         className="flex flex-col w-full max-w-2xl mx-auto relative"
       >
+        {/* Simple Fade-In / Fade-Out Floating Text */}
+        <AnimatePresence>
+          {floatingText && (
+            <motion.div
+              key={floatingText.id}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: -25 }}
+              exit={{ opacity: 0, y: -45 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 px-3 py-1.5 rounded-xl font-bold text-sm tracking-wide pointer-events-none shadow-md bg-cyan-500/90 text-white"
+            >
+              {floatingText.text}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
           <BackButton onClick={() => setShowFleeModal(true)} label="Flee" />
@@ -203,38 +232,29 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
                 {[...Array(MAX_LIVES)].map((_, i) => (
                   <Heart 
                     key={i} 
-                    className={`w-5 h-5 sm:w-6 sm:h-6 transition-all duration-500 ${i < lives ? 'text-red-500 fill-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'text-zinc-700 opacity-30'}`} 
+                    className={`w-4 h-4 sm:w-5 sm:h-5 transition-all duration-500 ${i < lives ? 'text-red-500 fill-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'text-zinc-700 opacity-30'}`} 
                   />
                 ))}
               </div>
               <div className="w-px h-8 bg-white/10" />
               <div>
                 <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Question</div>
-                <div className="text-xl font-black text-white">{currentIndex + 1}<span className="text-sm text-zinc-500">/{MAX_QUESTIONS}</span></div>
+                <div className="text-xl font-black text-white">{totalAnsweredCount + 1}</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* --- GAME OVER / VICTORY VIEW --- */}
-        {isGameOver || isVictory ? (
+        {/* --- GAME OVER VIEW --- */}
+        {isGameOver ? (
           <motion.div 
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             className="flex flex-col items-center justify-center w-full text-center p-8 sm:p-12 bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl mt-4"
           >
-            {isVictory ? (
-              <Trophy className="w-20 h-20 text-yellow-400 mb-6 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
-            ) : (
-              <ShieldAlert className="w-20 h-20 text-red-500 mb-6 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]" />
-            )}
-            
-            <h2 className="text-4xl font-black text-white mb-2 uppercase tracking-tight">
-              {isVictory ? "Gauntlet Cleared" : "Run Terminated"}
-            </h2>
-            <p className="text-zinc-400 mb-8 font-medium">
-              {isVictory ? `You survived the ${difficulty} gauntlet.` : `You ran out of lives in the gauntlet.`}
-            </p>
+            <ShieldAlert className="w-20 h-20 text-red-500 mb-6 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]" />
+            <h2 className="text-4xl font-black text-white mb-2 uppercase tracking-tight">Run Terminated</h2>
+            <p className="text-zinc-400 mb-8 font-medium">You ran out of lives in the gauntlet.</p>
 
             <div className="flex gap-10 mb-10">
               <div>
@@ -247,7 +267,7 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
               </div>
             </div>
 
-            {/* Play Again Button with Cyan/Purple Gradient Theme */}
+            {/* Custom Fluid Wave Play Again Button */}
             <motion.div 
               initial="rest"
               whileHover="hover"
@@ -256,7 +276,7 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
               className="relative overflow-hidden w-full max-w-xs py-4 bg-zinc-900 border border-white/20 rounded-2xl font-bold text-lg text-white shadow-xl cursor-pointer"
             >
               <motion.div 
-                className="absolute left-1/2 w-[800px] h-[800px] bg-purple-500/40 z-0"
+                className="absolute left-1/2 w-[800px] h-[800px] bg-cyan-500/40 z-0"
                 style={{ borderRadius: "40%", x: "-50%" }}
                 animate={{ rotate: [0, 360] }}
                 variants={{ 
@@ -265,7 +285,6 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
                 }}
                 transition={{ rotate: { duration: 6, ease: "linear", repeat: Infinity } }}
               />
-              
               <motion.div 
                 className="absolute left-1/2 w-[800px] h-[800px] bg-gradient-to-t from-cyan-600 to-purple-600 z-0"
                 style={{ borderRadius: "43%", x: "-50%" }}
@@ -276,7 +295,6 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
                 }}
                 transition={{ rotate: { duration: 7, ease: "linear", repeat: Infinity } }}
               />
-
               <span className="relative z-10 drop-shadow-md uppercase tracking-wider text-sm">Play Again</span>
             </motion.div>
           </motion.div>
@@ -400,7 +418,7 @@ export default function GauntletGame({ difficulty, onExit, onPlayAgain }) {
                       className="group flex items-center gap-2 px-6 py-3 bg-zinc-900/60 border border-white/10 text-zinc-400 hover:text-white hover:border-cyan-500/50 hover:bg-zinc-800 rounded-xl font-semibold tracking-wide transition-all shadow-lg cursor-pointer"
                     >
                       <FastForward className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                      Tactical Pass (-{difficulty === 'hard' ? 7 : difficulty === 'medium' ? 5 : 3} pts)
+                      Tactical Pass (-{currentQ.difficulty.toLowerCase() === 'hard' ? 7 : currentQ.difficulty.toLowerCase() === 'medium' ? 5 : 3} pts)
                     </button>
                   </motion.div>
                 ) : countdown !== null ? (

@@ -58,7 +58,7 @@ export default function GauntletSetup({ onBack, onSelectDifficulty }) {
                 Global Gauntlet
               </h2>
               <p className="text-cyan-400/80 text-sm font-semibold tracking-widest uppercase mt-1">
-                Select Difficulty • Universal Pool
+                Select Difficulty • Endless Survival
               </p>
             </div>
           </div>
@@ -136,7 +136,7 @@ export default function GauntletSetup({ onBack, onSelectDifficulty }) {
                 </li>
                 <li className="flex items-start gap-3">
                   <Heart className="w-5 h-5 text-red-500 fill-red-500 shrink-0 mt-0.5" />
-                  <p><strong>3 Lives Limit:</strong> 10 questions total. Lose 3 lives and your run is terminated.</p>
+                  <p><strong>Endless Survival:</strong> Starts with 5 lives. Survive batches of 10 questions to regenerate +1 heart. Lose all lives and your run terminates.</p>
                 </li>
                 <li className="flex items-start gap-3">
                   <Flame className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
