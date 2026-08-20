@@ -1,0 +1,12 @@
+# Backend ignores
+backend/__pycache__/
+backend/*.db
+backend/.env
+
+# Frontend ignores
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+#Ignore specific files
+run.txt
