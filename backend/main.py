@@ -21,7 +21,8 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-DB_NAME = "trivia.db"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_NAME = os.path.join(BASE_DIR, "trivia.db")
 
 def get_db_connection():
     conn = sqlite3.connect(DB_NAME)
