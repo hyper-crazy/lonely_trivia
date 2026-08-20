@@ -4,22 +4,21 @@ import os
 from dotenv import load_dotenv
 load_dotenv()  # Load environment variables from .env file
 
-API_KEY = os.getenv("SECRET_API_KEY")
 GOOGLE_AI_API_KEY = os.getenv("GOOGLE_AI_API_KEY")
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-app = FastAPI(title="LonelyTrivia API", version="1.0")
+app = FastAPI()
 
 # Enable CORS for local development and future PWA frontends
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Allows all origins for testing
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allows all headers
 )
 
 DB_NAME = "trivia.db"
