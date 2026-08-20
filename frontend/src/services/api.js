@@ -4,7 +4,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export async function fetchTopics() {
   try {
-    const res = await fetch(`${API_BASE_URL}/topics`);
+    const res = await fetch(`${API_BASE_URL}/api/topics`);
     if (!res.ok) throw new Error('Failed to fetch topics');
     const data = await res.json();
     return data.topics;
@@ -16,7 +16,7 @@ export async function fetchTopics() {
 
 export async function fetchPracticeQuestions(topic) {
   try {
-    const res = await fetch(`${API_BASE_URL}/practice/${encodeURIComponent(topic)}`);
+    const res = await fetch(`${API_BASE_URL}/api/practice/${encodeURIComponent(topic)}`);
     if (!res.ok) throw new Error('Failed to fetch practice questions');
     const data = await res.json();
     return data.questions;
@@ -28,7 +28,7 @@ export async function fetchPracticeQuestions(topic) {
 
 export async function fetchSprintQuestions(topic) {
   try {
-    const res = await fetch(`${API_BASE_URL}/sprint/${encodeURIComponent(topic)}`);
+    const res = await fetch(`${API_BASE_URL}/api/sprint/${encodeURIComponent(topic)}`);
     if (!res.ok) throw new Error('Failed to fetch sprint questions');
     const data = await res.json();
     return data.questions;
@@ -40,7 +40,7 @@ export async function fetchSprintQuestions(topic) {
 
 export async function fetchGauntletQuestions(difficulty) {
   try {
-    const res = await fetch(`${API_BASE_URL}/gauntlet/${encodeURIComponent(difficulty)}`);
+    const res = await fetch(`${API_BASE_URL}/api/gauntlet/${encodeURIComponent(difficulty)}`);
     if (!res.ok) throw new Error('Failed to fetch gauntlet questions');
     const data = await res.json();
     return data.questions;
