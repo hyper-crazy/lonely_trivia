@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">LonelyTrivia</string>
+    <string name="title_activity_main">LonelyTrivia</string>
+    <string name="package_name">com.lonelyDev.lonelytrivia</string>
+    <string name="custom_url_scheme">com.lonelyDev.lonelytrivia</string>
+</resources>
