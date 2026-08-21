@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crosshair, RefreshCcw, Lock, Info, X, Heart, Trophy } from 'lucide-react'; 
+import { Crosshair, RefreshCcw, Lock, Info, X, Heart, Trophy, Zap, Flame } from 'lucide-react'; 
 import BackButton from './BackButton';
 import SprintGame from './SprintGame';
 
@@ -54,7 +54,6 @@ export default function SprintSetup({ topics, onBack }) {
       streak10: streakStats.streak10 + (roundStreaks?.streak10 || 0)
     };
 
-    // Only regenerate +1 heart if the stage was cleared cleanly (last question wasn't passed/failed)
     const restoredLives = clearedCleanly ? Math.min(MAX_LIVES, survivingLives + 1) : survivingLives;
 
     setAccumulatedScore(newTotalScore);
@@ -116,38 +115,38 @@ export default function SprintSetup({ topics, onBack }) {
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="flex flex-col items-center justify-center w-full max-w-lg mx-auto text-center p-8 bg-zinc-900/90 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl mt-12"
+        className="flex flex-col items-center justify-center w-full max-w-lg mx-auto text-center p-6 sm:p-8 bg-zinc-900/90 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl my-auto"
       >
-        <Trophy className="w-20 h-20 text-yellow-400 mb-6 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
-        <h2 className="text-3xl font-black text-white mb-2 uppercase tracking-tight">
+        <Trophy className="w-16 h-16 text-yellow-400 mb-4 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
+        <h2 className="text-2xl sm:text-3xl font-black text-white mb-1 uppercase tracking-tight">
           {lastRunStats.cleared ? "Grandmaster Sweep!" : "Run Terminated"}
         </h2>
-        <p className="text-zinc-400 mb-6 font-medium">
-          {lastRunStats.cleared ? "You successfully conquered all 15 rounds!" : "Your run came to an end."}
+        <p className="text-zinc-400 text-xs sm:text-sm mb-6 font-medium">
+          {lastRunStats.cleared ? "You successfully conquered all rounds!" : "Your run came to an end."}
         </p>
 
         {/* Detailed Stats Grid */}
-        <div className="grid grid-cols-2 gap-4 w-full mb-8 text-left bg-zinc-950/60 p-5 rounded-2xl border border-white/5 font-mono">
+        <div className="grid grid-cols-2 gap-3 w-full mb-6 text-left bg-zinc-950/60 p-4 rounded-xl border border-white/5 font-mono text-xs">
           <div>
-            <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Total Score</div>
-            <div className="text-2xl font-black text-purple-400">{lastRunStats.score}</div>
+            <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">Total Score</div>
+            <div className="text-xl font-black text-purple-400">{lastRunStats.score}</div>
           </div>
           <div>
-            <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Best Score</div>
-            <div className="text-2xl font-black text-white">{bestScore}</div>
+            <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">Best Score</div>
+            <div className="text-xl font-black text-white">{bestScore}</div>
           </div>
           <div>
-            <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Rounds Played</div>
-            <div className="text-xl font-bold text-zinc-200">{lastRunStats.roundsPlayed} / {topics.length}</div>
+            <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">Rounds Played</div>
+            <div className="text-base font-bold text-zinc-200">{lastRunStats.roundsPlayed} / {topics.length}</div>
           </div>
           <div>
-            <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Streaks (5x / 10x)</div>
-            <div className="text-xl font-bold text-orange-400">{lastRunStats.streak5} / {lastRunStats.streak10}</div>
+            <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">Streaks (5x/10x)</div>
+            <div className="text-base font-bold text-orange-400">{lastRunStats.streak5} / {lastRunStats.streak10}</div>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 w-full">
-          {/* Fluid Water Play Again Button */}
+        <div className="flex flex-col sm:flex-row gap-2.5 w-full">
+          {/* Restored Double-Wave Fluid Play Again Button */}
           <motion.div 
             initial="rest"
             whileHover="hover"
@@ -161,10 +160,10 @@ export default function SprintSetup({ topics, onBack }) {
               setRunEnded(false);
               setLastRunStats(null);
             }}
-            className="relative overflow-hidden flex-1 py-4 bg-zinc-900 border border-white/20 rounded-2xl font-bold text-lg text-white shadow-xl cursor-pointer text-center"
+            className="relative overflow-hidden flex-1 py-3 bg-zinc-900 border border-white/20 rounded-xl font-bold text-sm text-white shadow-xl cursor-pointer text-center"
           >
             <motion.div 
-              className="absolute left-1/2 w-[800px] h-[800px] bg-purple-600/40 z-0"
+              className="absolute left-1/2 w-[600px] h-[600px] bg-purple-600/40 z-0"
               style={{ borderRadius: "40%", x: "-50%" }}
               animate={{ rotate: [0, 360] }}
               variants={{ 
@@ -173,9 +172,8 @@ export default function SprintSetup({ topics, onBack }) {
               }}
               transition={{ rotate: { duration: 6, ease: "linear", repeat: Infinity } }}
             />
-            
             <motion.div 
-              className="absolute left-1/2 w-[800px] h-[800px] bg-gradient-to-t from-purple-700 to-indigo-600 z-0"
+              className="absolute left-1/2 w-[600px] h-[600px] bg-gradient-to-t from-purple-700 to-indigo-600 z-0"
               style={{ borderRadius: "43%", x: "-50%" }}
               animate={{ rotate: [360, 0] }}
               variants={{ 
@@ -184,13 +182,12 @@ export default function SprintSetup({ topics, onBack }) {
               }}
               transition={{ rotate: { duration: 7, ease: "linear", repeat: Infinity } }}
             />
-
-            <span className="relative z-10 drop-shadow-md uppercase tracking-wider text-sm">Play Again</span>
+            <span className="relative z-10 drop-shadow-md uppercase tracking-wider text-xs">Play Again</span>
           </motion.div>
 
           <button 
             onClick={onBack} 
-            className="flex-1 py-3.5 px-4 bg-zinc-800 hover:bg-zinc-700 text-white rounded-2xl font-bold tracking-wide transition-colors cursor-pointer"
+            className="flex-1 py-3 px-4 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-bold text-xs tracking-wide transition-colors cursor-pointer"
           >
             Main Menu
           </button>
@@ -224,7 +221,7 @@ export default function SprintSetup({ topics, onBack }) {
         animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
         exit={{ opacity: 0, scale: 1.05, filter: "blur(4px)" }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className="flex flex-col w-full max-w-3xl mx-auto relative"
+        className="flex flex-col w-full max-w-xl mx-auto h-full justify-center px-2 py-2 overflow-hidden relative"
       >
         {/* Persistent Heart Refill Visual Notification */}
         <AnimatePresence>
@@ -234,63 +231,62 @@ export default function SprintSetup({ topics, onBack }) {
               animate={{ opacity: 1, y: -10, scale: 1 }}
               exit={{ opacity: 0, y: -35, scale: 0.9 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="absolute top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 bg-red-500 text-white font-black text-sm uppercase tracking-wider rounded-2xl shadow-[0_0_20px_rgba(239,68,68,0.5)] pointer-events-none"
+              className="absolute top-2 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-red-500 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.5)] pointer-events-none"
             >
               +1 ❤️ Heart Restored!
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Header */}
-        <div className="flex items-center justify-between mb-10 px-2">
-          <BackButton onClick={onBack} label="Retreat" />
-          <div className="flex items-center gap-4">
-            <div className="px-4 py-2 bg-purple-500/10 border border-purple-500/30 rounded-2xl text-purple-300 text-sm font-bold flex items-center gap-3">
-              <span>Score: <strong className="text-white">{accumulatedScore}</strong></span>
-              <span className="w-px h-4 bg-white/10" />
-              <span className="text-pink-400">Round {currentRound} of {topics.length}</span>
-            </div>
+        {/* Header with Aligned Buttons */}
+        <div className="flex items-center justify-between mb-4 px-1">
+          <div className="flex items-center gap-2">
+            <BackButton onClick={onBack} label="Retreat" />
             <button 
               onClick={() => setShowRules(true)}
-              className="p-2.5 rounded-full bg-zinc-900/80 border border-white/10 text-zinc-400 hover:text-pink-400 hover:border-pink-500/50 transition-all shadow-lg cursor-pointer"
+              className="p-2 rounded-xl bg-zinc-900/60 border border-white/10 text-zinc-400 hover:text-pink-400 hover:border-pink-500/50 transition-all shadow-lg cursor-pointer flex items-center justify-center"
+              title="Topic Sprint Rules"
             >
-              <Info className="w-5 h-5" />
+              <Info className="w-4 h-4" />
             </button>
-            <div className="text-right hidden sm:block">
-              <h2 className="text-3xl font-black bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-500 bg-clip-text text-transparent uppercase tracking-tight">
-                Draft Your Arena
-              </h2>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="px-3 py-1.5 bg-purple-500/10 border border-purple-500/30 rounded-xl text-purple-300 text-xs font-bold flex items-center gap-2">
+              <span>Score: <strong className="text-white">{accumulatedScore}</strong></span>
+              <span className="w-px h-3 bg-white/10" />
+              <span className="text-pink-400">R{currentRound}/{topics.length}</span>
             </div>
           </div>
         </div>
 
         {/* The 4-Card Draft Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mb-4">
           {draftedTopics.map((item, index) => (
             <motion.button
               key={index} 
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ 
                 opacity: isRerolling ? 0 : 1, 
                 y: isRerolling ? 10 : 0, 
                 scale: isRerolling ? 0.95 : 1,
                 filter: isRerolling ? "blur(4px)" : "blur(0px)"
               }}
-              transition={{ duration: 0.3, delay: isRerolling ? 0 : index * 0.1, ease: "easeOut" }}
-              whileHover={!isRerolling ? { scale: 1.03, borderColor: "rgba(236, 72, 153, 0.6)" } : {}}
-              whileTap={!isRerolling ? { scale: 0.97 } : {}}
+              transition={{ duration: 0.3, delay: isRerolling ? 0 : index * 0.06, ease: "easeOut" }}
+              whileHover={!isRerolling ? { scale: 1.02, borderColor: "rgba(236, 72, 153, 0.6)" } : {}}
+              whileTap={!isRerolling ? { scale: 0.98 } : {}}
               onClick={() => !isRerolling && setActiveTopic(item.topic)}
-              className="group relative flex flex-col items-start justify-center p-6 bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-2xl cursor-pointer overflow-hidden shadow-xl"
+              className="group relative flex flex-col items-start justify-center p-3.5 sm:p-4 bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-xl cursor-pointer overflow-hidden shadow-xl"
             >
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-pink-500/10 to-transparent -translate-y-full group-hover:translate-y-full transition-transform duration-1000 ease-in-out" />
               
               <div className="relative z-10 flex items-center justify-between w-full">
-                <div className="text-xl font-bold text-zinc-100 group-hover:text-white tracking-wide">
+                <div className="text-sm sm:text-base font-bold text-zinc-100 group-hover:text-white tracking-wide truncate">
                   {item.topic}
                 </div>
-                <Crosshair className="w-5 h-5 text-zinc-600 group-hover:text-pink-400 transition-colors" />
+                <Crosshair className="w-4 h-4 text-zinc-600 group-hover:text-pink-400 transition-colors shrink-0" />
               </div>
-              <div className="relative z-10 text-xs text-zinc-500 font-mono mt-2 group-hover:text-pink-300/70 transition-colors">
+              <div className="relative z-10 text-[10px] sm:text-xs text-zinc-500 font-mono mt-1 group-hover:text-pink-300/70 transition-colors">
                 Available Intel: {item.count} Questions
               </div>
             </motion.button>
@@ -300,23 +296,68 @@ export default function SprintSetup({ topics, onBack }) {
         {/* Limited Reroll Action */}
         <div className="flex justify-center">
           <motion.button
-            whileHover={!hasRerolled ? { scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" } : {}}
+            whileHover={!hasRerolled ? { scale: 1.03, backgroundColor: "rgba(255, 255, 255, 0.1)" } : {}}
             whileTap={!hasRerolled ? { scale: 0.95 } : {}}
             onClick={handleReroll}
             disabled={isRerolling || hasRerolled}
-            className={`flex items-center gap-3 px-6 py-3 rounded-full border bg-zinc-900/50 backdrop-blur-md transition-all font-semibold uppercase tracking-wider text-sm shadow-lg ${
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full border bg-zinc-900/50 backdrop-blur-md transition-all font-semibold uppercase tracking-wider text-xs shadow-lg ${
               hasRerolled 
                 ? "border-zinc-800 text-zinc-600 cursor-not-allowed opacity-70" 
                 : "border-white/20 text-zinc-300 hover:text-white hover:border-white/40 cursor-pointer"
             }`}
           >
             <motion.div animate={isRerolling ? { rotate: 360 } : {}} transition={{ duration: 0.4, ease: "easeInOut" }}>
-              {hasRerolled ? <Lock className="w-4 h-4" /> : <RefreshCcw className="w-4 h-4" />}
+              {hasRerolled ? <Lock className="w-3.5 h-3.5" /> : <RefreshCcw className="w-3.5 h-3.5" />}
             </motion.div>
             {hasRerolled ? "Reroll Exhausted" : "Reroll Options (1 Left)"}
           </motion.button>
         </div>
       </motion.div>
+
+      {/* Rules Modal */}
+      <AnimatePresence>
+        {showRules && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="relative bg-zinc-900 border border-white/10 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-md w-full"
+            >
+              <button 
+                onClick={() => setShowRules(false)}
+                className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              
+              <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 mb-6 uppercase tracking-tight">
+                Sprint Rules
+              </h3>
+              
+              <ul className="space-y-4 text-sm text-zinc-300">
+                <li className="flex items-start gap-3">
+                  <Crosshair className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" />
+                  <p><strong>Draft Arenas:</strong> Choose a topic category for each round and complete 10 rapid questions.</p>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Heart className="w-5 h-5 text-red-500 fill-red-500 shrink-0 mt-0.5" />
+                  <p><strong>Heart Regeneration:</strong> Clear a round cleanly without failing or passing your final question to restore +1 ❤️ Heart.</p>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Flame className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
+                  <p><strong>Streak Bonuses:</strong> Build streaks for bonus points (+25 at 5x, +50 at 10x).</p>
+                </li>
+              </ul>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

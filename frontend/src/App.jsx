@@ -36,7 +36,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center p-4 sm:p-6 md:p-10 select-none overflow-x-hidden relative">
+    <div className="h-[100dvh] w-screen bg-[#09090b] text-white flex items-center justify-center p-2 sm:p-4 select-none overflow-hidden relative">
       
       {/* Interactive Mouse Tracker Glow (Desktop Only) */}
       <div 
@@ -47,11 +47,11 @@ export default function App() {
       />
 
       {/* Static ambient background orbs */}
-      <div className="absolute w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none -top-32 -left-32" />
-      <div className="absolute w-[500px] h-[500px] bg-pink-600/10 rounded-full blur-[120px] pointer-events-none -bottom-32 -right-32" />
+      <div className="absolute w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px] pointer-events-none -top-32 -left-32" />
+      <div className="absolute w-[400px] h-[400px] bg-pink-600/10 rounded-full blur-[100px] pointer-events-none -bottom-32 -right-32" />
 
       {/* Main Responsive Container */}
-      <div className="w-full max-w-4xl mx-auto flex flex-col items-center justify-center min-h-[75vh] z-10 px-2 sm:px-4">
+      <div className="w-full max-w-4xl h-full mx-auto flex flex-col items-center justify-center z-10 px-2 overflow-hidden">
         <AnimatePresence mode="wait">
           {currentScreen === 'home' && (
             <HomeMenu 

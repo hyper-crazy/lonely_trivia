@@ -41,59 +41,61 @@ export default function GauntletSetup({ onBack, onSelectDifficulty }) {
         animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
         exit={{ opacity: 0, scale: 1.05, filter: "blur(4px)" }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className="flex flex-col w-full max-w-3xl mx-auto"
+        className="flex flex-col w-full max-w-xl mx-auto h-full justify-center px-2 py-2 overflow-hidden"
       >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-10 px-2">
-          <BackButton onClick={onBack} label="Retreat" />
-          <div className="flex items-center gap-4">
+        {/* Header with cleaner alignment */}
+        <div className="flex items-center justify-between mb-4 px-1">
+          <div className="flex items-center gap-2">
+            <BackButton onClick={onBack} label="Retreat" />
             <button 
               onClick={() => setShowRules(true)}
-              className="p-2.5 rounded-full bg-zinc-900/80 border border-white/10 text-zinc-400 hover:text-pink-400 hover:border-pink-500/50 transition-all shadow-lg cursor-pointer"
+              className="p-2 rounded-xl bg-zinc-900/60 border border-white/10 text-zinc-400 hover:text-pink-400 hover:border-pink-500/50 transition-all shadow-lg cursor-pointer flex items-center justify-center"
+              title="Gauntlet Rules"
             >
-              <Info className="w-5 h-5" />
+              <Info className="w-4 h-4" />
             </button>
-            <div className="text-right">
-              <h2 className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-500 bg-clip-text text-transparent drop-shadow-sm uppercase tracking-tight">
-                Global Gauntlet
-              </h2>
-              <p className="text-cyan-400/80 text-sm font-semibold tracking-widest uppercase mt-1">
-                Select Difficulty • Endless Survival
-              </p>
-            </div>
+          </div>
+
+          <div className="text-right">
+            <h2 className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-500 bg-clip-text text-transparent drop-shadow-sm uppercase tracking-tight">
+              Global Gauntlet
+            </h2>
+            <p className="text-cyan-400/80 text-[10px] sm:text-xs font-semibold tracking-widest uppercase mt-0.5">
+              Select Difficulty • Endless Survival
+            </p>
           </div>
         </div>
 
         {/* Difficulty Cards Grid */}
-        <div className="grid grid-cols-1 gap-4 mb-8">
+        <div className="grid grid-cols-1 gap-2.5 sm:gap-3">
           {DIFFICULTIES.map((item, index) => {
             const Icon = item.icon;
             return (
               <motion.button
                 key={item.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                whileHover={{ scale: 1.02, x: 6 }}
+                transition={{ duration: 0.3, delay: index * 0.08 }}
+                whileHover={{ scale: 1.02, x: 4 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => onSelectDifficulty(item.id)}
-                className={`group relative flex items-center justify-between p-6 bg-zinc-900/80 backdrop-blur-xl border rounded-2xl cursor-pointer overflow-hidden shadow-xl transition-all ${item.color}`}
+                className={`group relative flex items-center justify-between p-3.5 sm:p-4 bg-zinc-900/80 backdrop-blur-xl border rounded-xl cursor-pointer overflow-hidden shadow-xl transition-all ${item.color}`}
               >
-                <div className="flex items-center gap-5">
-                  <div className="p-4 bg-white/5 rounded-xl border border-white/10 group-hover:scale-110 transition-transform">
-                    <Icon className="w-8 h-8" />
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="p-2.5 sm:p-3 bg-white/5 rounded-xl border border-white/10 group-hover:scale-110 transition-transform shrink-0">
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div className="text-left">
-                    <div className="text-2xl font-bold text-white tracking-wide mb-1">
+                    <div className="text-base sm:text-lg font-bold text-white tracking-wide leading-tight mb-0.5">
                       {item.name}
                     </div>
-                    <p className="text-sm text-zinc-400 font-medium">
+                    <p className="text-[11px] sm:text-xs text-zinc-400 font-medium leading-snug">
                       {item.desc}
                     </p>
                   </div>
                 </div>
-                <div className="text-right shrink-0 pl-4">
-                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-mono font-bold tracking-wider text-white">
+                <div className="text-right shrink-0 pl-3">
+                  <span className="px-2.5 py-1 bg-white/10 rounded-full text-[10px] sm:text-xs font-mono font-bold tracking-wider text-white">
                     {item.points}
                   </span>
                 </div>
@@ -136,7 +138,7 @@ export default function GauntletSetup({ onBack, onSelectDifficulty }) {
                 </li>
                 <li className="flex items-start gap-3">
                   <Heart className="w-5 h-5 text-red-500 fill-red-500 shrink-0 mt-0.5" />
-                  <p><strong>Endless Survival:</strong> Starts with 5 lives. Survive batches of 10 questions to regenerate +1 heart. Lose all lives and your run terminates.</p>
+                  <p><strong>Endless Survival:</strong> Starts with 5 lives. Run continues until you lose all lives. No heart regeneration.</p>
                 </li>
                 <li className="flex items-start gap-3">
                   <Flame className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />

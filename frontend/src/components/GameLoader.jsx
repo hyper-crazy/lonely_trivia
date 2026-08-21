@@ -3,19 +3,16 @@ import { motion } from 'framer-motion';
 const THEMES = {
   purple: {
     text: "from-purple-400 via-fuchsia-400 to-indigo-400",
-    // Deep, punchy neon purples, magentas, and electric indigos
     colors: ["#c084fc", "#e879f9", "#818cf8", "#f43f5e", "#c084fc"],
     shadow: "rgba(192, 132, 252, 0.6)"
   },
   pink: {
     text: "from-pink-400 via-rose-400 to-purple-400",
-    // Hyper-vibrant electric pinks, hot roses, and bright magentas
     colors: ["#f43f5e", "#ec4899", "#fb7185", "#d946ef", "#f43f5e"],
     shadow: "rgba(244, 63, 94, 0.6)"
   },
   cyan: {
     text: "from-cyan-400 via-teal-400 to-purple-400",
-    // Brilliant electric cyans, bright turquoises, and vibrant indigos
     colors: ["#22d3ee", "#2dd4bf", "#38bdf8", "#818cf8", "#22d3ee"],
     shadow: "rgba(34, 211, 238, 0.6)"
   }
@@ -25,9 +22,9 @@ export default function GameLoader({ text = "Loading Arena...", theme = "purple"
   const currentTheme = THEMES[theme] || THEMES.purple;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] w-full text-center relative select-none">
+    <div className="flex flex-col items-center justify-center h-full w-full text-center relative select-none py-10">
       {/* iOS Dock-Style Wave Dots with Hyper-Vibrant Color Shifting */}
-      <div className="flex items-center gap-2.5 mb-6">
+      <div className="flex items-center gap-2.5 mb-5">
         {[0, 1, 2, 3].map((i) => (
           <motion.div
             key={i}
